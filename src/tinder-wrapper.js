@@ -27,7 +27,7 @@ const handleResponse = ({ statusCode, statusMessage, body }) => {
   }
 
   if (body && body.status && body.status !== 200) {
-    throw new Error(body.error)
+    throw new Error(`${body.status} ${body.error}`)
   }
 
   return body
@@ -74,9 +74,6 @@ class TinderWrapper {
 
     const options = {
       url: `${BASE_URL}/auth`,
-      headers: {
-        'X-Auth-Token': this._authToken
-      },
       body: {
         facebook_token: facebookAccessToken,
         facebook_id: facebookUserId,
