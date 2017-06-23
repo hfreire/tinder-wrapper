@@ -12,7 +12,7 @@
 One function to check the health status of all your app modules.
 
 ### Features
-* Retries failing requests in :shit: temporary and unexpected system and :boom: network failures :white_check_mark:
+* Retries :shit: failing requests in temporary and unexpected system and :boom: network failures :white_check_mark:
 * Uses [Brakes](https://github.com/awolden/brakes) circuit breakers to :hand: fail-fast until it is safe to retry :white_check_mark: 
 * Supports [Bluebird](https://github.com/petkaantonov/bluebird) :bird: promises :white_check_mark:
 
