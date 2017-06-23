@@ -26,20 +26,20 @@
     "chai": "4.0.2",
     "chai-as-promised": "7.0.0",
     "coveralls": "2.13.1",
-    "eslint": "3.19.0",
-    "eslint-config-hfreire": "1.0.4",
-    "eslint-plugin-import": "2.3.0",
+    "eslint": "4.0.0",
+    "eslint-config-hfreire": "1.0.6",
+    "eslint-plugin-import": "2.6.0",
     "eslint-plugin-json": "1.2.0",
-    "eslint-plugin-mocha": "4.9.0",
+    "eslint-plugin-mocha": "4.11.0",
     "eslint-plugin-node": "5.0.0",
     "eslint-plugin-promise": "3.5.0",
     "eslint-plugin-standard": "3.0.1",
-    "eslint-plugin-unicorn": "2.1.1",
+    "eslint-plugin-unicorn": "2.1.2",
     "istanbul": "0.4.5",
     "mocha": "3.4.2",
     "semantic-release": "6.3.6",
-    "pre-git": "3.14.1",
-    "testdouble": "3.0.0"
+    "pre-git": "3.15.0",
+    "testdouble": "3.1.1"
   },
   "config": {
     "pre-git": {
