@@ -38,4 +38,4 @@ tinder.authorize(facebookAccessToken, facebookUserId)
 ```
 
 ### Used by
-* [serverful](https://github.com/hfreire/serverful) - A kickass :muscle: web server :scream_cat: with all the bells :bell: and whistles :sparkles:
+* [get-me-a-date](https://github.com/hfreire/get-me-a-date) - :heart_eyes: Help me get a :cupid: date tonight :first_quarter_moon_with_face:
