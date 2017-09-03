@@ -5,6 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+/* eslint-disable promise/no-callback-in-promise */
+
 const { TinderNotAuthorizedError, TinderOutOfLikesError } = require('../src/errors')
 
 describe('Tinder Wrapper', () => {
@@ -115,11 +117,13 @@ describe('Tinder Wrapper', () => {
       subject = new TinderWrapper()
     })
 
-    it('should reject with invalid arguments error', () => {
-      return subject.authorize(facebookAccessToken, facebookUserId)
+    it('should reject with invalid arguments error', (done) => {
+      subject.authorize(facebookAccessToken, facebookUserId)
         .catch((error) => {
           error.should.be.instanceOf(Error)
           error.message.should.be.equal('invalid arguments')
+
+          done()
         })
     })
   })
@@ -128,6 +132,7 @@ describe('Tinder Wrapper', () => {
     const statusCode = 200
     const body = {}
     const response = { statusCode, body }
+    const authToken = 'my-access-token'
 
     beforeEach(() => {
       td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
@@ -136,6 +141,7 @@ describe('Tinder Wrapper', () => {
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
+      subject.authToken = authToken
     })
 
     it('should do a get request to https://api.gotinder.com/user/recs', () => {
@@ -159,23 +165,17 @@ describe('Tinder Wrapper', () => {
   })
 
   describe('when getting recommendations and not authorized', () => {
-    const statusCode = 401
-    const body = {}
-    const response = { statusCode, body }
-
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.when(request.get(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback(null, response)
-      td.replace('request', request)
-
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
     })
 
-    it('should reject with tinder not authorized error', () => {
-      return subject.getRecommendations()
+    it('should reject with tinder not authorized error', (done) => {
+      subject.getRecommendations()
         .catch((error) => {
           error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
         })
     })
   })
@@ -184,6 +184,7 @@ describe('Tinder Wrapper', () => {
     const statusCode = 200
     const body = {}
     const response = { statusCode, body }
+    const authToken = 'my-access-token'
 
     beforeEach(() => {
       td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
@@ -192,6 +193,7 @@ describe('Tinder Wrapper', () => {
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
+      subject.authToken = authToken
     })
 
     it('should do a get request to https://api.gotinder.com/meta', () => {
@@ -214,11 +216,28 @@ describe('Tinder Wrapper', () => {
     })
   })
 
+  describe('when getting account and not authorized', () => {
+    beforeEach(() => {
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.getAccount()
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
+        })
+    })
+  })
+
   describe('when getting user', () => {
     const userId = 'my-user-id'
     const statusCode = 200
     const body = {}
     const response = { statusCode, body }
+    const authToken = 'my-access-token'
 
     beforeEach(() => {
       td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
@@ -227,6 +246,7 @@ describe('Tinder Wrapper', () => {
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
+      subject.authToken = authToken
     })
 
     it('should do a get request to https://api.gotinder.com/user/my-user-id', () => {
@@ -249,6 +269,24 @@ describe('Tinder Wrapper', () => {
     })
   })
 
+  describe('when getting user and not authorized', () => {
+    const userId = 'my-user-id'
+
+    beforeEach(() => {
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.getUser(userId)
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
+        })
+    })
+  })
+
   describe('when getting user with invalid id', () => {
     const userId = undefined
 
@@ -257,11 +295,13 @@ describe('Tinder Wrapper', () => {
       subject = new TinderWrapper()
     })
 
-    it('should reject with invalid arguments error', () => {
-      return subject.getUser(userId)
+    it('should reject with invalid arguments error', (done) => {
+      subject.getUser(userId)
         .catch((error) => {
           error.should.be.instanceOf(Error)
           error.message.should.be.equal('invalid arguments')
+
+          done()
         })
     })
   })
@@ -271,6 +311,7 @@ describe('Tinder Wrapper', () => {
     const statusCode = 200
     const body = {}
     const response = { statusCode, body }
+    const authToken = 'my-access-token'
 
     beforeEach(() => {
       td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
@@ -279,6 +320,7 @@ describe('Tinder Wrapper', () => {
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
+      subject.authToken = authToken
     })
 
     it('should do a post request to https://api.gotinder.com/updates', () => {
@@ -317,6 +359,7 @@ describe('Tinder Wrapper', () => {
     const statusCode = 200
     const body = {}
     const response = { statusCode, body }
+    const authToken = 'my-access-token'
 
     beforeEach(() => {
       td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
@@ -325,6 +368,7 @@ describe('Tinder Wrapper', () => {
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
+      subject.authToken = authToken
     })
 
     it('should do a post request to https://api.gotinder.com/updates', () => {
@@ -370,11 +414,29 @@ describe('Tinder Wrapper', () => {
       subject = new TinderWrapper()
     })
 
-    it('should reject with invalid arguments error', () => {
-      return subject.getUpdates(lastActivityDate)
+    it('should reject with invalid arguments error', (done) => {
+      subject.getUpdates(lastActivityDate)
         .catch((error) => {
           error.should.be.instanceOf(Error)
           error.message.should.be.equal('invalid arguments')
+
+          done()
+        })
+    })
+  })
+
+  describe('when getting updates and not authorized', () => {
+    beforeEach(() => {
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.getUpdates()
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
         })
     })
   })
@@ -385,6 +447,7 @@ describe('Tinder Wrapper', () => {
     const statusCode = 200
     const body = {}
     const response = { statusCode, body }
+    const authToken = 'my-access-token'
 
     beforeEach(() => {
       td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
@@ -393,6 +456,7 @@ describe('Tinder Wrapper', () => {
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
+      subject.authToken = authToken
     })
 
     it('should do a post request to https://api.gotinder.com/user/matches/my-match-id', () => {
@@ -439,11 +503,32 @@ describe('Tinder Wrapper', () => {
       subject = new TinderWrapper()
     })
 
-    it('should reject with invalid arguments error', () => {
-      return subject.sendMessage(matchId, message)
+    it('should reject with invalid arguments error', (done) => {
+      subject.sendMessage(matchId, message)
         .catch((error) => {
           error.should.be.instanceOf(Error)
           error.message.should.be.equal('invalid arguments')
+
+          done()
+        })
+    })
+  })
+
+  describe('when sending message and not authorized', () => {
+    const matchId = 'my-match-id'
+    const message = 'my-message'
+
+    beforeEach(() => {
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.sendMessage(matchId, message)
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
         })
     })
   })
@@ -456,6 +541,7 @@ describe('Tinder Wrapper', () => {
     const statusCode = 200
     const body = { likes_remaining: 100 }
     const response = { statusCode, body }
+    const authToken = 'my-access-token'
 
     beforeEach(() => {
       td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
@@ -464,6 +550,7 @@ describe('Tinder Wrapper', () => {
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
+      subject.authToken = authToken
     })
 
     it('should do a get request to https://api.gotinder.com/like/my-user-id?photoId=my-photo-id&content_hash=my-content-hash&s_number=my-s-number', () => {
@@ -494,6 +581,7 @@ describe('Tinder Wrapper', () => {
     const statusCode = 200
     const body = { likes_remaining: 0 }
     const response = { statusCode, body }
+    const authToken = 'my-access-token'
 
     beforeEach(() => {
       td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
@@ -502,12 +590,15 @@ describe('Tinder Wrapper', () => {
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
+      subject.authToken = authToken
     })
 
-    it('should reject with tinder out of likes error', () => {
-      return subject.like(userId, photoId, contentHash, sNumber)
+    it('should reject with tinder out of likes error', (done) => {
+      subject.like(userId, photoId, contentHash, sNumber)
         .catch((error) => {
           error.should.be.instanceOf(TinderOutOfLikesError)
+
+          done()
         })
     })
   })
@@ -523,11 +614,34 @@ describe('Tinder Wrapper', () => {
       subject = new TinderWrapper()
     })
 
-    it('should reject with invalid arguments error', () => {
-      return subject.like(userId)
+    it('should reject with invalid arguments error', (done) => {
+      subject.like(userId)
         .catch((error) => {
           error.should.be.instanceOf(Error)
           error.message.should.be.equal('invalid arguments')
+
+          done()
+        })
+    })
+  })
+
+  describe('when liking and not authorized', () => {
+    const userId = 'my-user-id'
+    const photoId = 'my-photo-id'
+    const contentHash = 'my-content-hash'
+    const sNumber = 'my-s-number'
+
+    beforeEach(() => {
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.like(userId, photoId, contentHash, sNumber)
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
         })
     })
   })
@@ -537,6 +651,7 @@ describe('Tinder Wrapper', () => {
     const statusCode = 200
     const body = {}
     const response = { statusCode, body }
+    const authToken = 'my-access-token'
 
     beforeEach(() => {
       td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
@@ -545,6 +660,7 @@ describe('Tinder Wrapper', () => {
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
+      subject.authToken = authToken
     })
 
     it('should do a get request to https://api.gotinder.com/pass/my-user-id', () => {
@@ -578,11 +694,31 @@ describe('Tinder Wrapper', () => {
       subject = new TinderWrapper()
     })
 
-    it('should reject with invalid arguments error', () => {
-      return subject.pass(userId)
+    it('should reject with invalid arguments error', (done) => {
+      subject.pass(userId)
         .catch((error) => {
           error.should.be.instanceOf(Error)
           error.message.should.be.equal('invalid arguments')
+
+          done()
+        })
+    })
+  })
+
+  describe('when passing and not authorized', () => {
+    const userId = 'my-user-id'
+
+    beforeEach(() => {
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.pass(userId)
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
         })
     })
   })
