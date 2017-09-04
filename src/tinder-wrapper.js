@@ -16,16 +16,7 @@ const { TinderNotAuthorizedError, TinderOutOfLikesError } = require('./errors')
 
 const request = require('request')
 
-const handleResponse = ({ statusCode, statusMessage, body }) => {
-  if (statusCode >= 300) {
-    switch (statusCode) {
-      case 401:
-        throw new TinderNotAuthorizedError()
-      default:
-        throw new Error(`${statusCode} ${statusMessage}`)
-    }
-  }
-
+const handleResponse = ({ body }) => {
   if (body && body.status && body.status !== 200) {
     throw new Error(`${body.status} ${body.error}`)
   }
@@ -43,7 +34,13 @@ const defaultOptions = {
       'Accept-Language': 'en'
     }
   },
-  retry: { max_tries: 2, interval: 1000, timeout: 16000, throw_original: true },
+  retry: {
+    max_tries: 2,
+    interval: 1000,
+    timeout: 16000,
+    throw_original: true,
+    predicate: (error) => !(error instanceof TinderNotAuthorizedError)
+  },
   breaker: { timeout: 12000, threshold: 80, circuitDuration: 3 * 60 * 60 * 1000 }
 }
 
@@ -55,36 +52,42 @@ class TinderWrapper {
 
     this._breaker = new Brakes(this._options.breaker)
 
-    this._getRequestCircuitBreaker = this._breaker.slaveCircuit((...params) => this._request.getAsync(...params))
-    this._postRequestCircuitBreaker = this._breaker.slaveCircuit((...params) => this._request.postAsync(...params))
+    this._getRequestCircuitBreaker = this._breaker.slaveCircuit((...params) => retry(() => this._getRequest(...params), this._options.retry))
+    this._postRequestCircuitBreaker = this._breaker.slaveCircuit((...params) => retry(() => this._postRequest(...params), this._options.retry))
 
     this._getRequest = (...params) => {
-      return retry(() => {
-        return this._getRequestCircuitBreaker.exec(...params)
-          .then((response) => {
-            const { statusCode, statusMessage } = response
+      return this._request.getAsync(...params)
+        .then((response) => {
+          const { statusCode, statusMessage } = response
 
-            if (statusCode >= 500) {
-              throw new Error(`${statusCode} ${statusMessage}`)
+          if (statusCode >= 300) {
+            switch (statusCode) {
+              case 401:
+                throw new TinderNotAuthorizedError()
+              default:
+                throw new Error(`${statusCode} ${statusMessage}`)
             }
+          }
 
-            return response
-          })
-      }, this._options.retry)
+          return response
+        })
     }
     this._postRequest = (...params) => {
-      return retry(() => {
-        return this._postRequestCircuitBreaker.exec(...params)
-          .then((response) => {
-            const { statusCode, statusMessage } = response
+      return this._request.postAsync(...params)
+        .then((response) => {
+          const { statusCode, statusMessage } = response
 
-            if (statusCode >= 500) {
-              throw new Error(`${statusCode} ${statusMessage}`)
+          if (statusCode >= 300) {
+            switch (statusCode) {
+              case 401:
+                throw new TinderNotAuthorizedError()
+              default:
+                throw new Error(`${statusCode} ${statusMessage}`)
             }
+          }
 
-            return response
-          })
-      }, this._options.retry)
+          return response
+        })
     }
   }
 
@@ -113,7 +116,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._postRequest(options)
+        return this._postRequestCircuitBreaker.exec(options)
           .then((response) => handleResponse(response))
           .then((data) => {
             this._authToken = data.token
@@ -138,7 +141,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._getRequest(options)
+        return this._getRequestCircuitBreaker.exec(options)
           .then((response) => handleResponse(response))
       })
   }
@@ -158,7 +161,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._getRequest(options)
+        return this._getRequestCircuitBreaker.exec(options)
           .then((response) => handleResponse(response))
       })
   }
@@ -182,7 +185,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._getRequest(options)
+        return this._getRequestCircuitBreaker.exec(options)
           .then((response) => handleResponse(response))
       })
   }
@@ -214,7 +217,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._postRequest(options)
+        return this._postRequestCircuitBreaker.exec(options)
           .then((response) => handleResponse(response))
       })
   }
@@ -239,7 +242,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._postRequest(options)
+        return this._postRequestCircuitBreaker.exec(options)
           .then((response) => handleResponse(response))
       })
   }
@@ -263,7 +266,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._getRequest(options)
+        return this._getRequestCircuitBreaker.exec(options)
           .then((response) => handleResponse(response))
           .then((data) => {
             if (data && !data.likes_remaining) {
@@ -294,7 +297,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._getRequest(options)
+        return this._getRequestCircuitBreaker.exec(options)
           .then((response) => handleResponse(response))
       })
   }
