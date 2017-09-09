@@ -99,6 +99,10 @@ class TinderWrapper {
     return this._authToken
   }
 
+  get circuitBreaker () {
+    return this._breaker
+  }
+
   authorize (facebookAccessToken, facebookUserId) {
     return Promise.try(() => {
       if (!facebookAccessToken || !facebookUserId) {
