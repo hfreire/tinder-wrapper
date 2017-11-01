@@ -62,5 +62,8 @@
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "semantic-release": "./node_modules/.bin/semantic-release pre && npm publish && node_modules/.bin/semantic-release post",
     "commit": "./node_modules/.bin/commit-wizard"
+  },
+  "release": {
+    "analyzeCommits": "simple-commit-message"
   }
 }
