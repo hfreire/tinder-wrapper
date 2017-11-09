@@ -58,7 +58,7 @@
     "compile": "npm run clean && mkdir -p lib && ./node_modules/.bin/babel src/ -d lib",
     "prepublish": "npm run compile",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
-    "semantic-release": "./node_modules/.bin/semantic-release pre && npm publish && node_modules/.bin/semantic-release post",
+    "semantic-release": "./node_modules/.bin/semantic-release",
     "commit": "./node_modules/.bin/commit-wizard"
   }
 }
