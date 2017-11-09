@@ -9,7 +9,7 @@
 [![Version](https://img.shields.io/npm/v/tinder-wrapper.svg)](https://www.npmjs.com/package/tinder-wrapper)
 [![Downloads](https://img.shields.io/npm/dt/tinder-wrapper.svg)](https://www.npmjs.com/package/tinder-wrapper) 
 
-A Tinder wrapper library.
+> A Tinder wrapper library.
 
 ### Features
 * Retries :shit: failing requests in temporary and unexpected system and :boom: network failures :white_check_mark:
