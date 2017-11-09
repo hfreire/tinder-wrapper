@@ -11,18 +11,17 @@ const { TinderNotAuthorizedError, TinderOutOfLikesError } = require('../src/erro
 
 describe('Tinder Wrapper', () => {
   let subject
-  let request
+  let Request
 
   before(() => {
-    request = td.object([ 'defaults', 'get', 'post' ])
+    Request = td.constructor([ 'get', 'post' ])
   })
 
   afterEach(() => td.reset())
 
   describe('when constructing', () => {
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.replace('request', request)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -31,26 +30,21 @@ describe('Tinder Wrapper', () => {
     it('should set default request headers', () => {
       const captor = td.matchers.captor()
 
-      td.verify(request.defaults(captor.capture()))
+      td.verify(new Request(captor.capture()))
 
       const options = captor.value
-      options.should.have.nested.property('headers.User-Agent', 'Tinder Android Version 4.5.5')
-      options.should.have.nested.property('headers.os_version', '23')
-      options.should.have.nested.property('headers.platform', 'android')
-      options.should.have.nested.property('headers.app-version', '854')
-      options.should.have.nested.property('headers.Accept-Language', 'en')
+      options.should.have.nested.property('request.headers.User-Agent', 'Tinder Android Version 4.5.5')
+      options.should.have.nested.property('request.headers.os_version', '23')
+      options.should.have.nested.property('request.headers.platform', 'android')
+      options.should.have.nested.property('request.headers.app-version', '854')
+      options.should.have.nested.property('request.headers.Accept-Language', 'en')
     })
   })
 
-  describe('when constructing and loading request', () => {
+  describe('when constructing and loading request-on-steroids', () => {
     beforeEach(() => {
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
-    })
-
-    it('should create a request with defaults function', () => {
-      subject._request.should.have.property('defaults')
-      subject._request.get.should.be.instanceOf(Function)
     })
 
     it('should create a request with get function', () => {
@@ -73,9 +67,8 @@ describe('Tinder Wrapper', () => {
     const response = { statusCode, body }
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.when(request.post(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback(null, response)
-      td.replace('request', request)
+      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -86,7 +79,7 @@ describe('Tinder Wrapper', () => {
     it('should do a post request to https://api.gotinder.com/auth', () => {
       const captor = td.matchers.captor()
 
-      td.verify(request.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+      td.verify(Request.prototype.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
       const options = captor.value
       options.should.have.property('url', 'https://api.gotinder.com/auth')
@@ -95,7 +88,7 @@ describe('Tinder Wrapper', () => {
     it('should do a post request with body', () => {
       const captor = td.matchers.captor()
 
-      td.verify(request.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+      td.verify(Request.prototype.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
       const options = captor.value
       options.should.have.nested.property('body.facebook_token', facebookAccessToken)
@@ -135,9 +128,8 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.when(request.get(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback(null, response)
-      td.replace('request', request)
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -149,7 +141,7 @@ describe('Tinder Wrapper', () => {
         .then(() => {
           const captor = td.matchers.captor()
 
-          td.verify(request.get(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+          td.verify(Request.prototype.get(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
           const options = captor.value
           options.should.have.property('url', 'https://api.gotinder.com/user/recs')
@@ -165,7 +157,33 @@ describe('Tinder Wrapper', () => {
   })
 
   describe('when getting recommendations and not authorized', () => {
+    const statusCode = 401
+    const response = { statusCode }
+    const authToken = 'my-access-token'
+
     beforeEach(() => {
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.replace('request-on-steroids', Request)
+
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+      subject.authToken = authToken
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.getRecommendations()
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
+        })
+    })
+  })
+
+  describe('when getting recommendations without an access token', () => {
+    beforeEach(() => {
+      td.replace('request-on-steroids', Request)
+
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
     })
@@ -187,9 +205,8 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.when(request.get(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback(null, response)
-      td.replace('request', request)
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -201,7 +218,7 @@ describe('Tinder Wrapper', () => {
         .then(() => {
           const captor = td.matchers.captor()
 
-          td.verify(request.get(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+          td.verify(Request.prototype.get(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
           const options = captor.value
           options.should.have.property('url', 'https://api.gotinder.com/meta')
@@ -217,7 +234,33 @@ describe('Tinder Wrapper', () => {
   })
 
   describe('when getting account and not authorized', () => {
+    const statusCode = 401
+    const response = { statusCode }
+    const authToken = 'my-access-token'
+
     beforeEach(() => {
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.replace('request-on-steroids', Request)
+
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+      subject.authToken = authToken
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.getAccount()
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
+        })
+    })
+  })
+
+  describe('when getting account without an access token', () => {
+    beforeEach(() => {
+      td.replace('request-on-steroids', Request)
+
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
     })
@@ -240,9 +283,8 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.when(request.get(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback(null, response)
-      td.replace('request', request)
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -254,7 +296,7 @@ describe('Tinder Wrapper', () => {
         .then(() => {
           const captor = td.matchers.captor()
 
-          td.verify(request.get(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+          td.verify(Request.prototype.get(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
           const options = captor.value
           options.should.have.property('url', 'https://api.gotinder.com/user/my-user-id')
@@ -270,9 +312,36 @@ describe('Tinder Wrapper', () => {
   })
 
   describe('when getting user and not authorized', () => {
+    const statusCode = 401
+    const response = { statusCode }
+    const authToken = 'my-access-token'
     const userId = 'my-user-id'
 
     beforeEach(() => {
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.replace('request-on-steroids', Request)
+
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+      subject.authToken = authToken
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.getUser(userId)
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
+        })
+    })
+  })
+
+  describe('when getting user without an access token', () => {
+    const userId = 'my-user-id'
+
+    beforeEach(() => {
+      td.replace('request-on-steroids', Request)
+
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
     })
@@ -314,9 +383,8 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.when(request.post(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback(null, response)
-      td.replace('request', request)
+      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -328,7 +396,7 @@ describe('Tinder Wrapper', () => {
         .then(() => {
           const captor = td.matchers.captor()
 
-          td.verify(request.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+          td.verify(Request.prototype.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
           const options = captor.value
           options.should.have.property('url', 'https://api.gotinder.com/updates')
@@ -340,7 +408,7 @@ describe('Tinder Wrapper', () => {
         .then(() => {
           const captor = td.matchers.captor()
 
-          td.verify(request.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+          td.verify(Request.prototype.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
           const options = captor.value
           options.should.have.nested.property('body.last_activity_date', lastActivityDate.toISOString())
@@ -362,9 +430,8 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.when(request.post(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback(null, response)
-      td.replace('request', request)
+      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -376,7 +443,7 @@ describe('Tinder Wrapper', () => {
         .then(() => {
           const captor = td.matchers.captor()
 
-          td.verify(request.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+          td.verify(Request.prototype.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
           const options = captor.value
           options.should.have.property('url', 'https://api.gotinder.com/updates')
@@ -388,7 +455,7 @@ describe('Tinder Wrapper', () => {
         .then(() => {
           const captor = td.matchers.captor()
 
-          td.verify(request.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+          td.verify(Request.prototype.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
           const options = captor.value
           options.should.have.nested.property('body.last_activity_date', '')
@@ -407,8 +474,7 @@ describe('Tinder Wrapper', () => {
     const lastActivityDate = null
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.replace('request', request)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -426,7 +492,33 @@ describe('Tinder Wrapper', () => {
   })
 
   describe('when getting updates and not authorized', () => {
+    const statusCode = 401
+    const response = { statusCode }
+    const authToken = 'my-access-token'
+
     beforeEach(() => {
+      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.replace('request-on-steroids', Request)
+
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+      subject.authToken = authToken
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.getUpdates()
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
+        })
+    })
+  })
+
+  describe('when getting updates without an access token', () => {
+    beforeEach(() => {
+      td.replace('request-on-steroids', Request)
+
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
     })
@@ -450,9 +542,8 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.when(request.post(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback(null, response)
-      td.replace('request', request)
+      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -464,7 +555,7 @@ describe('Tinder Wrapper', () => {
         .then(() => {
           const captor = td.matchers.captor()
 
-          td.verify(request.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+          td.verify(Request.prototype.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
           const options = captor.value
           options.should.have.property('url', 'https://api.gotinder.com/user/matches/my-match-id')
@@ -476,7 +567,7 @@ describe('Tinder Wrapper', () => {
         .then(() => {
           const captor = td.matchers.captor()
 
-          td.verify(request.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+          td.verify(Request.prototype.post(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
           const options = captor.value
           options.should.have.nested.property('body.message', message)
@@ -496,8 +587,7 @@ describe('Tinder Wrapper', () => {
     const message = undefined
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.replace('request', request)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -515,10 +605,38 @@ describe('Tinder Wrapper', () => {
   })
 
   describe('when sending message and not authorized', () => {
+    const statusCode = 401
+    const response = { statusCode }
+    const authToken = 'my-access-token'
     const matchId = 'my-match-id'
     const message = 'my-message'
 
     beforeEach(() => {
+      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.replace('request-on-steroids', Request)
+
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+      subject.authToken = authToken
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.sendMessage(matchId, message)
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
+        })
+    })
+  })
+
+  describe('when sending message without an access token', () => {
+    const matchId = 'my-match-id'
+    const message = 'my-message'
+
+    beforeEach(() => {
+      td.replace('request-on-steroids', Request)
+
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
     })
@@ -544,9 +662,8 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.when(request.get(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback(null, response)
-      td.replace('request', request)
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -558,7 +675,7 @@ describe('Tinder Wrapper', () => {
         .then(() => {
           const captor = td.matchers.captor()
 
-          td.verify(request.get(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+          td.verify(Request.prototype.get(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
           const options = captor.value
           options.should.have.property('url', 'https://api.gotinder.com/like/my-user-id?photoId=my-photo-id&content_hash=my-content-hash&s_number=my-s-number')
@@ -584,9 +701,8 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.when(request.get(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback(null, response)
-      td.replace('request', request)
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -607,8 +723,7 @@ describe('Tinder Wrapper', () => {
     const userId = undefined
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.replace('request', request)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -626,12 +741,42 @@ describe('Tinder Wrapper', () => {
   })
 
   describe('when liking and not authorized', () => {
+    const statusCode = 401
+    const response = { statusCode }
+    const authToken = 'my-access-token'
     const userId = 'my-user-id'
     const photoId = 'my-photo-id'
     const contentHash = 'my-content-hash'
     const sNumber = 'my-s-number'
 
     beforeEach(() => {
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.replace('request-on-steroids', Request)
+
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+      subject.authToken = authToken
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.like(userId, photoId, contentHash, sNumber)
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
+        })
+    })
+  })
+
+  describe('when liking without an access token', () => {
+    const userId = 'my-user-id'
+    const photoId = 'my-photo-id'
+    const contentHash = 'my-content-hash'
+    const sNumber = 'my-s-number'
+
+    beforeEach(() => {
+      td.replace('request-on-steroids', Request)
+
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
     })
@@ -654,9 +799,8 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.when(request.get(td.matchers.anything()), { ignoreExtraArgs: true }).thenCallback(null, response)
-      td.replace('request', request)
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -668,7 +812,7 @@ describe('Tinder Wrapper', () => {
         .then(() => {
           const captor = td.matchers.captor()
 
-          td.verify(request.get(captor.capture()), { ignoreExtraArgs: true, times: 1 })
+          td.verify(Request.prototype.get(captor.capture()), { ignoreExtraArgs: true, times: 1 })
 
           const options = captor.value
           options.should.have.property('url', 'https://api.gotinder.com/pass/my-user-id')
@@ -687,8 +831,7 @@ describe('Tinder Wrapper', () => {
     const userId = undefined
 
     beforeEach(() => {
-      td.when(request.defaults(), { ignoreExtraArgs: true }).thenReturn(request)
-      td.replace('request', request)
+      td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
@@ -706,9 +849,36 @@ describe('Tinder Wrapper', () => {
   })
 
   describe('when passing and not authorized', () => {
+    const statusCode = 401
+    const response = { statusCode }
+    const authToken = 'my-access-token'
     const userId = 'my-user-id'
 
     beforeEach(() => {
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.replace('request-on-steroids', Request)
+
+      const TinderWrapper = require('../src/tinder-wrapper')
+      subject = new TinderWrapper()
+      subject.authToken = authToken
+    })
+
+    it('should reject with tinder not authorized error', (done) => {
+      subject.pass(userId)
+        .catch((error) => {
+          error.should.be.instanceOf(TinderNotAuthorizedError)
+
+          done()
+        })
+    })
+  })
+
+  describe('when passing without an access token', () => {
+    const userId = 'my-user-id'
+
+    beforeEach(() => {
+      td.replace('request-on-steroids', Request)
+
       const TinderWrapper = require('../src/tinder-wrapper')
       subject = new TinderWrapper()
     })

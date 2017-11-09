@@ -9,14 +9,21 @@ const BASE_URL = 'https://api.gotinder.com'
 
 const _ = require('lodash')
 const Promise = require('bluebird')
-const retry = require('bluebird-retry')
-const Brakes = require('brakes')
 
 const { TinderNotAuthorizedError, TinderOutOfLikesError } = require('./errors')
 
-const request = require('request')
+const Request = require('request-on-steroids')
 
-const handleResponse = ({ body }) => {
+const responseHandler = ({ statusCode, statusMessage, body }) => {
+  if (statusCode >= 300) {
+    switch (statusCode) {
+      case 401:
+        throw new TinderNotAuthorizedError()
+      default:
+        throw new Error(`${statusCode} ${statusMessage}`)
+    }
+  }
+
   if (body && body.status && body.status !== 200) {
     throw new Error(`${body.status} ${body.error}`)
   }
@@ -25,70 +32,34 @@ const handleResponse = ({ body }) => {
 }
 
 const defaultOptions = {
-  request: {
-    headers: {
-      'User-Agent': 'Tinder Android Version 4.5.5',
-      'os_version': '23',
-      'platform': 'android',
-      'app-version': '854',
-      'Accept-Language': 'en'
+  'request-on-steroids': {
+    request: {
+      headers: {
+        'User-Agent': 'Tinder Android Version 4.5.5',
+        'os_version': '23',
+        'platform': 'android',
+        'app-version': '854',
+        'Accept-Language': 'en'
+      }
+    },
+    perseverance: {
+      retry: {
+        max_tries: 2,
+        interval: 1000,
+        timeout: 16000,
+        throw_original: true,
+        predicate: (error) => !(error instanceof TinderNotAuthorizedError)
+      },
+      breaker: { timeout: 12000, threshold: 80, circuitDuration: 3 * 60 * 60 * 1000 }
     }
-  },
-  retry: {
-    max_tries: 2,
-    interval: 1000,
-    timeout: 16000,
-    throw_original: true,
-    predicate: (error) => !(error instanceof TinderNotAuthorizedError)
-  },
-  breaker: { timeout: 12000, threshold: 80, circuitDuration: 3 * 60 * 60 * 1000 }
+  }
 }
 
 class TinderWrapper {
   constructor (options = {}) {
     this._options = _.defaultsDeep(options, defaultOptions)
 
-    this._request = Promise.promisifyAll(request.defaults(this._options.request))
-
-    this._breaker = new Brakes(this._options.breaker)
-
-    this._getRequestCircuitBreaker = this._breaker.slaveCircuit((...params) => retry(() => this._getRequest(...params), this._options.retry))
-    this._postRequestCircuitBreaker = this._breaker.slaveCircuit((...params) => retry(() => this._postRequest(...params), this._options.retry))
-
-    this._getRequest = (...params) => {
-      return this._request.getAsync(...params)
-        .then((response) => {
-          const { statusCode, statusMessage } = response
-
-          if (statusCode >= 300) {
-            switch (statusCode) {
-              case 401:
-                throw new TinderNotAuthorizedError()
-              default:
-                throw new Error(`${statusCode} ${statusMessage}`)
-            }
-          }
-
-          return response
-        })
-    }
-    this._postRequest = (...params) => {
-      return this._request.postAsync(...params)
-        .then((response) => {
-          const { statusCode, statusMessage } = response
-
-          if (statusCode >= 300) {
-            switch (statusCode) {
-              case 401:
-                throw new TinderNotAuthorizedError()
-              default:
-                throw new Error(`${statusCode} ${statusMessage}`)
-            }
-          }
-
-          return response
-        })
-    }
+    this._request = new Request(_.get(this._options, 'request-on-steroids'))
   }
 
   set authToken (authToken) {
@@ -100,7 +71,7 @@ class TinderWrapper {
   }
 
   get circuitBreaker () {
-    return this._breaker
+    return this._request.circuitBreaker
   }
 
   authorize (facebookAccessToken, facebookUserId) {
@@ -120,8 +91,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._postRequestCircuitBreaker.exec(options)
-          .then((response) => handleResponse(response))
+        return this._request.post(options, responseHandler)
           .then((data) => {
             this._authToken = data.token
 
@@ -145,8 +115,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._getRequestCircuitBreaker.exec(options)
-          .then((response) => handleResponse(response))
+        return this._request.get(options, responseHandler)
       })
   }
 
@@ -165,8 +134,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._getRequestCircuitBreaker.exec(options)
-          .then((response) => handleResponse(response))
+        return this._request.get(options, responseHandler)
       })
   }
 
@@ -189,8 +157,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._getRequestCircuitBreaker.exec(options)
-          .then((response) => handleResponse(response))
+        return this._request.get(options, responseHandler)
       })
   }
 
@@ -221,8 +188,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._postRequestCircuitBreaker.exec(options)
-          .then((response) => handleResponse(response))
+        return this._request.post(options, responseHandler)
       })
   }
 
@@ -246,8 +212,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._postRequestCircuitBreaker.exec(options)
-          .then((response) => handleResponse(response))
+        return this._request.post(options, responseHandler)
       })
   }
 
@@ -270,8 +235,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._getRequestCircuitBreaker.exec(options)
-          .then((response) => handleResponse(response))
+        return this._request.get(options, responseHandler)
           .then((data) => {
             if (data && !data.likes_remaining) {
               throw new TinderOutOfLikesError()
@@ -301,8 +265,7 @@ class TinderWrapper {
           json: true
         }
 
-        return this._getRequestCircuitBreaker.exec(options)
-          .then((response) => handleResponse(response))
+        return this._request.get(options, responseHandler)
       })
   }
 }
