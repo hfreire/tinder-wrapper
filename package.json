@@ -39,18 +39,16 @@
     "istanbul": "0.4.5",
     "mocha": "4.0.1",
     "pre-git": "3.15.3",
-    "semantic-release": "7.0.2",
+    "semantic-release": "9.1.0",
     "testdouble": "3.2.6"
-  },
-    "greenkeeper": {
-    "ignore": [
-      "semantic-release"
-    ]
   },
   "config": {
     "pre-git": {
       "commit-msg": "conventional"
     }
+  },
+  "release": {
+    "analyzeCommits": "simple-commit-message"
   },
   "scripts": {
     "clean": "rm -rf lib coverage",
@@ -62,8 +60,5 @@
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "semantic-release": "./node_modules/.bin/semantic-release pre && npm publish && node_modules/.bin/semantic-release post",
     "commit": "./node_modules/.bin/commit-wizard"
-  },
-  "release": {
-    "analyzeCommits": "simple-commit-message"
   }
 }
