@@ -57,7 +57,7 @@ const defaultOptions = {
 
 class TinderWrapper {
   constructor (options = {}) {
-    this._options = _.defaultsDeep(options, defaultOptions)
+    this._options = _.defaultsDeep({}, options, defaultOptions)
 
     this._request = new Request(_.get(this._options, 'request-on-steroids'))
   }
