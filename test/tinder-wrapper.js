@@ -67,7 +67,7 @@ describe('Tinder Wrapper', () => {
     const response = { statusCode, body }
 
     beforeEach(() => {
-      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response))).thenResolve(body)
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -128,7 +128,7 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response))).thenResolve(body)
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -162,7 +162,7 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response))).thenResolve()
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -205,7 +205,7 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response))).thenResolve(body)
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -239,7 +239,7 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response))).thenResolve()
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -283,7 +283,7 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response))).thenResolve(body)
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -318,7 +318,7 @@ describe('Tinder Wrapper', () => {
     const userId = 'my-user-id'
 
     beforeEach(() => {
-      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response))).thenResolve()
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -383,7 +383,7 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response))).thenResolve(body)
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -430,7 +430,7 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response))).thenResolve(body)
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -497,7 +497,7 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response))).thenResolve()
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -542,7 +542,7 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response))).thenResolve(body)
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -612,7 +612,7 @@ describe('Tinder Wrapper', () => {
     const message = 'my-message'
 
     beforeEach(() => {
-      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.when(Request.prototype.post(td.matchers.anything(), td.callback(response))).thenResolve()
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -662,7 +662,7 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response))).thenResolve(body)
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -701,7 +701,7 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response))).thenResolve(body)
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -750,7 +750,7 @@ describe('Tinder Wrapper', () => {
     const sNumber = 'my-s-number'
 
     beforeEach(() => {
-      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response))).thenResolve()
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -799,7 +799,7 @@ describe('Tinder Wrapper', () => {
     const authToken = 'my-access-token'
 
     beforeEach(() => {
-      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve(body)
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response))).thenResolve(body)
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
@@ -855,7 +855,7 @@ describe('Tinder Wrapper', () => {
     const userId = 'my-user-id'
 
     beforeEach(() => {
-      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response)), { ignoreExtraArgs: true }).thenResolve()
+      td.when(Request.prototype.get(td.matchers.anything(), td.callback(response))).thenResolve()
       td.replace('request-on-steroids', Request)
 
       const TinderWrapper = require('../src/tinder-wrapper')
