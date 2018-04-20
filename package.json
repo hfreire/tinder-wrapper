@@ -38,7 +38,7 @@
     "eslint-plugin-unicorn": "4.0.3",
     "istanbul": "0.4.5",
     "mocha": "5.1.1",
-    "pre-git": "3.17.0",
+    "pre-git": "3.17.1",
     "semantic-release": "15.1.7",
     "testdouble": "3.7.0"
   },
