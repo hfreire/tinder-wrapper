@@ -39,7 +39,7 @@
     "istanbul": "0.4.5",
     "mocha": "5.1.1",
     "pre-git": "3.17.1",
-    "semantic-release": "15.1.11",
+    "semantic-release": "15.3.0",
     "testdouble": "3.8.1"
   },
   "config": {
