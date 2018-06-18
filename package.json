@@ -19,7 +19,8 @@
   "dependencies": {
     "bluebird": "3.5.1",
     "lodash": "4.17.9",
-    "request-on-steroids": "1.1.28"
+    "request-on-steroids": "1.1.28",
+    "snyk": "^1.83.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
@@ -57,9 +58,12 @@
     "prepublish": "npm run compile",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "semantic-release": "./node_modules/.bin/semantic-release",
-    "commit": "./node_modules/.bin/commit-wizard"
+    "commit": "./node_modules/.bin/commit-wizard",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "release": {
     "analyzeCommits": "simple-commit-message"
-  }
+  },
+  "snyk": true
 }
