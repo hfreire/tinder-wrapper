@@ -11,7 +11,7 @@ git clone https://github.com/my-github-username/tinder-wrapper
 
 Change current directory
 ```
-cd get-me-date
+cd tinder-wrapper
 ```
 
 Install NPM dependencies
