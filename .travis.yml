@@ -1,26 +1,26 @@
 language: node_js
 node_js:
-  - 8.9.0
+- 8.9.0
 cache:
   directories:
-    - node_modules
+  - node_modules
 notifications:
   email: false
   slack:
     rooms:
-      secure: nnkzVM4iL6nCILxLtMivzmRbN2jPC8vodXBZhYUGW0DL3+dgbgN9HxxRarAjJX4ExagJeVDuTe4FbExPJ9qMVG0HitzRg+fHgH8m/sei5elKM2idhgHUYMswv8M91STgbdYPGeGvabgUmdIw439oKVL9iUrs+QO6GReM1TRXMWeM799TV19l4Zt0AbtWh16F+X8/Sp6p0EdmBKXRlaTNfWsQOl9fyvhCweZFpA6+wjbypxafuiGiBGXIf2RT9cCTyJxG6Qx+7UEqQvjA6+Q76cbn4xa+nV34e8Whl+2JDHKGVipwen9w+3H4HabSum17Si4FTxsNyuA+Q+3pbEYcYnnRefvk2tjFxFFa8IKbBsDIZL6pKBBF24M+Jry8rcIjgvpxSIPVfmjJiOMKHXx6NEJ8F/7091i6ZjHAABhH5fVjJtUu3gV7HpOK3/M0MPi2/2/ND+HBKA4xk4lsDVmX4+lESOnaKqK4J17AhmkCQ761CWIP/x+8EV0KNIk1zLPX9kl7Le/mvAPLvWsQBffDlZ1kuVRgZADtfHoRA6PvZPIz6EFS2JSTl5nqkLXaspjYf8eyTqrs823x4LwtJ8njZ9/QRThz7qovkjbW2XjaJvh7CKnZOPVnuvowrgsL9JD5rysrqwSNkgFoCQxSDjmKv2tfN73flML+BS+4/29eRRI=
+      secure: Jhs7/Yhm1JdRU/gCY4c1GOcSaDo+04K0H0aYnw2EaOvkuiCtpa5z6IeTk2B1LzY8YGFR//ELP/cVyTG5xScFu30ZFaVazD6Xq8ZXEU99Tm6DAhw6MWNDu5uq8NMDU39QmB/Y/66pXjXO+3Cuua0Ag3IB6F0wrQUEKu50v6E+TaitzECKJE+gTkKABhGqwzxv+6tMiIzYkwoG5zEQo6hl+VICcNtoMeIFn54xAcBO7bWZ/lWU0PMtlMJaGBLJIRpKzpGF4N+0ATqgJfmLUXMkdi4ZV5aEfnCRf22L4lvOjTHkA6jZmrjRtwaPBOmLYDvTdQS9woFLqxeqKjh+a8PPh1nMkvcOoRrU+hj8cfeL1nz2KtWNfUj7TE+jHXMtiYBePKSjMm2gSaObUnTL9PDX1pBcfHH3XKKN0ths84gtB/wxfv4u8t3VxMKav+35YGflu7zYSByyivtqCWya6dzWXYbrT5hgdcFfPqS5TuoL3EjCHS6+25q1oBv9Y9OQs1IHOXZBkbrwu1qJW6xALi6yw3iWvBECwYHdx8mN6OCQFI240YiTGoOKfgFHD7eRLK9d5pGEkKFSJr5Vr37fSlkv+XnYPqewL0925ug2lEMzn9X4kuqnfesyN7q/P+TnWDqZS9RhMBOgFDEVXnoLiw2mH8agMUgg72F2sI8fDuFINYI=
     on_success: never
     on_failure: always
     on_pull_requests: false
 install:
-  - npm install
+- npm install
 before_install:
-  - npm install -g greenkeeper-lockfile@1
+- npm install -g greenkeeper-lockfile@1
 before_script:
-  - npm prune
-  - greenkeeper-lockfile-update
+- npm prune
+- greenkeeper-lockfile-update
 after_success:
-  - npm run coveralls
-  - npm run semantic-release
+- npm run coveralls
+- npm run semantic-release
 after_script:
-  - greenkeeper-lockfile-upload
+- greenkeeper-lockfile-upload
