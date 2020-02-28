@@ -17,30 +17,32 @@
   },
   "homepage": "https://github.com/hfreire/tinder-wrapper#readme",
   "dependencies": {
-    "bluebird": "3.5.5",
-    "lodash": "4.17.11",
-    "request-on-steroids": "1.1.30"
+    "bluebird": "3.7.2",
+    "lodash": "4.17.15",
+    "request-on-steroids": "1.1.64"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
     "babel-preset-env": "1.7.0",
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
-    "coveralls": "3.0.3",
-    "eslint": "5.16.0",
-    "eslint-config-hfreire": "1.1.2",
-    "eslint-plugin-import": "2.17.3",
-    "eslint-plugin-json": "1.4.0",
-    "eslint-plugin-mocha": "5.3.0",
-    "eslint-plugin-node": "9.1.0",
-    "eslint-plugin-promise": "4.1.1",
-    "eslint-plugin-standard": "4.0.0",
-    "eslint-plugin-unicorn": "9.0.0",
+    "coveralls": "3.0.9",
+    "eslint": "6.8.0",
+    "eslint-config-hfreire": "2.0.5",
+    "eslint-plugin-import": "2.20.1",
+    "eslint-plugin-jest": "23.8.0",
+    "eslint-plugin-json": "2.1.0",
+    "eslint-plugin-mocha": "6.3.0",
+    "eslint-plugin-node": "11.0.0",
+    "eslint-plugin-promise": "4.2.1",
+    "eslint-plugin-standard": "4.0.1",
+    "eslint-plugin-unicorn": "16.1.1",
     "istanbul": "0.4.5",
-    "mocha": "6.1.4",
+    "mocha": "7.1.0",
     "pre-git": "3.17.1",
-    "semantic-release": "15.13.12",
-    "testdouble": "3.11.0"
+    "semantic-release": "17.0.4",
+    "snyk": "1.297.1",
+    "testdouble": "3.13.0"
   },
   "config": {
     "pre-git": {
@@ -48,15 +50,21 @@
       "allow-untracked-files": true
     }
   },
+  "snyk": true,
   "scripts": {
-    "clean": "rm -rf lib coverage",
-    "lint": "node_modules/.bin/eslint . --ext .json --ext .js",
-    "coverage": "node_modules/.bin/istanbul cover --include-all-sources --root src --print detail ./node_modules/mocha/bin/_mocha -- --recursive test",
-    "test": "npm run lint && npm run coverage",
-    "compile": "npm run clean && mkdir -p lib && ./node_modules/.bin/babel src/ -d lib",
-    "prepublish": "npm run compile",
+    "eslint": "node_modules/.bin/eslint --ext .json --ext .js .",
+    "istanbul": "node_modules/.bin/istanbul cover --include-all-sources --root src --print detail ./node_modules/mocha/bin/_mocha -- --recursive test",
+    "snyk:test": "./node_modules/.bin/snyk test",
+    "snyk:protect": "./node_modules/.bin/snyk protect",
+    "babel": "mkdir -p lib && ./node_modules/.bin/babel src/ -d lib",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "semantic-release": "./node_modules/.bin/semantic-release",
-    "commit": "./node_modules/.bin/commit-wizard"
+    "clean": "rm -rf lib coverage",
+    "lint": "npm run eslint",
+    "prepare": "npm run snyk:protect",
+    "test": "npm run clean && npm run lint && npm run istanbul",
+    "compile": "npm run clean && npm run babel",
+    "commit": "./node_modules/.bin/commit-wizard",
+    "prepublish": "npm run compile"
   }
 }
