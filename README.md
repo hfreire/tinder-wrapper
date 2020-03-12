@@ -2,6 +2,7 @@
 
 [![](https://github.com/hfreire/tinder-wrapper/workflows/ci/badge.svg)](https://github.com/hfreire/tinder-wrapper/actions?workflow=ci)
 [![Coverage Status](https://coveralls.io/repos/github/hfreire/tinder-wrapper/badge.svg?branch=master)](https://coveralls.io/github/hfreire/tinder-wrapper?branch=master)
+[![Known Vulnerabilities](https://snyk.io/test/github/hfreire/tinder-wrapper/badge.svg)](https://snyk.io/test/github/hfreire/tinder-wrapper)
 [![](https://img.shields.io/github/release/hfreire/tinder-wrapper.svg)](https://github.com/hfreire/tinder-wrapper/releases)
 [![Version](https://img.shields.io/npm/v/tinder-wrapper.svg)](https://www.npmjs.com/package/tinder-wrapper)
 [![Downloads](https://img.shields.io/npm/dt/tinder-wrapper.svg)](https://www.npmjs.com/package/tinder-wrapper)
