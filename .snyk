@@ -1,5 +1,5 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
-version: v1.12.0
+version: v1.14.1
 ignore: {}
 # patches apply the minimum changes required to fix a vulnerability
 patch:
@@ -8,3 +8,18 @@ patch:
         patched: '2018-07-03T07:38:13.918Z'
     - socks5-http-client > npm > npm-audit-report > cli-table2 > lodash:
         patched: '2018-07-03T07:38:13.918Z'
+  SNYK-JS-LODASH-567746:
+    - lodash:
+        patched: '2020-05-01T08:29:10.573Z'
+    - request-on-steroids > lodash:
+        patched: '2020-05-01T08:29:10.573Z'
+    - request-on-steroids > random-http-useragent > lodash:
+        patched: '2020-05-01T08:29:10.573Z'
+    - request-on-steroids > perseverance > lodash:
+        patched: '2020-05-01T08:29:10.573Z'
+    - request-on-steroids > perseverance > random-http-useragent > lodash:
+        patched: '2020-05-01T08:29:10.573Z'
+    - request-on-steroids > socks5-http-client > socks5-client > ip-address > lodash:
+        patched: '2020-05-01T08:29:10.573Z'
+    - request-on-steroids > socks5-https-client > socks5-client > ip-address > lodash:
+        patched: '2020-05-01T08:29:10.573Z'
