@@ -19,7 +19,7 @@
   "dependencies": {
     "bluebird": "3.7.2",
     "lodash": "4.17.19",
-    "request-on-steroids": "1.1.85"
+    "request-on-steroids": "1.1.86"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
