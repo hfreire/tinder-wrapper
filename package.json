@@ -18,7 +18,7 @@
   "homepage": "https://github.com/hfreire/tinder-wrapper#readme",
   "dependencies": {
     "bluebird": "3.7.2",
-    "lodash": "4.17.20",
+    "lodash": "4.17.21",
     "request-on-steroids": "1.1.106"
   },
   "devDependencies": {
